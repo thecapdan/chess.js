@@ -289,7 +289,7 @@ export const FLAGS = {
   QSIDE_CASTLE: 'q',
 }
 
-export const Chess = function (fen) {
+export const Chess = function (fen, disableCheck = false) {
   var board = new Array(128)
   var kings = { w: EMPTY, b: EMPTY }
   var turn = WHITE
@@ -656,8 +656,9 @@ export const Chess = function (fen) {
 
   function generate_moves(options) {
     function add_move(board, moves, from, to, flags) {
-      /* if pawn promotion */
-      if (
+      if (from == -1 || !board[from]) {
+        // ignore illegal position e.g. king is captured
+      } /* else if pawn promotion: */ else if (
         board[from].type === PAWN &&
         (rank(to) === RANK_8 || rank(to) === RANK_1)
       ) {
@@ -806,7 +807,7 @@ export const Chess = function (fen) {
     /* return all pseudo-legal moves (this includes moves that allow the king
      * to be captured)
      */
-    if (!legal) {
+    if (!legal || disableCheck) {
       return moves
     }
 
@@ -1838,7 +1839,7 @@ export const Chess = function (fen) {
       if (typeof move === 'string') {
         move_obj = move_from_san(move, sloppy)
       } else if (typeof move === 'object') {
-        var moves = generate_moves()
+        var moves = generate_moves({ legal: !sloppy })
 
         /* convert the pretty move object to an ugly move object */
         for (var i = 0, len = moves.length; i < len; i++) {
