@@ -441,10 +441,14 @@ export const Chess = function (fen, disableCheck = false) {
       return { valid: false, error_number: 3, error: errors[3] }
     }
 
+    /*
+      This check is skipped under spoof chess rules.
+      Needed to support pawns moving fromthe back row.
+    */
     /* 4th criterion: 4th field is a valid e.p.-string? */
-    if (!/^(-|[abcdefgh][36])$/.test(tokens[3])) {
-      return { valid: false, error_number: 4, error: errors[4] }
-    }
+    // if (!/^(-|[abcdefgh][36])$/.test(tokens[3])) {
+    //   return { valid: false, error_number: 4, error: errors[4] }
+    // }
 
     /* 5th criterion: 3th field is a valid castle-string? */
     if (!/^(KQ?k?q?|Qk?q?|kq?|q|-)$/.test(tokens[2])) {
@@ -675,6 +679,7 @@ export const Chess = function (fen, disableCheck = false) {
     var us = turn
     var them = swap_color(us)
     var second_rank = { b: RANK_7, w: RANK_2 }
+    var first_rank = { b: RANK_8, w: RANK_1 }
 
     var first_sq = SQUARE_MAP.a8
     var last_sq = SQUARE_MAP.h1
@@ -724,7 +729,7 @@ export const Chess = function (fen, disableCheck = false) {
 
           /* double square */
           var square = i + PAWN_OFFSETS[us][1]
-          if (second_rank[us] === rank(i) && board[square] == null) {
+          if ((second_rank[us] === rank(i) || first_rank[us] === rank(i)) && board[square] == null) {
             add_move(board, moves, i, square, BITS.BIG_PAWN)
           }
         }
