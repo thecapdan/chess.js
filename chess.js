@@ -673,6 +673,7 @@ export const Chess = function (fen, disableCheck = false) {
       } else {
         moves.push(build_move(board, from, to, flags))
       }
+      
     }
 
     var moves = []
@@ -809,24 +810,23 @@ export const Chess = function (fen, disableCheck = false) {
       }
     }
 
-    /* return all pseudo-legal moves (this includes moves that allow the king
-     * to be captured)
-     */
+  /* return all pseudo-legal moves (this includes moves that allow the king
+    * to be captured)
+    */
     if (!legal || disableCheck) {
-      return moves
+      return moves;
     }
-
-    /* filter out illegal moves */
-    var legal_moves = []
+  
+    var legal_moves = [];
     for (var i = 0, len = moves.length; i < len; i++) {
-      make_move(moves[i])
-      if (!king_attacked(us)) {
-        legal_moves.push(moves[i])
+      make_move(moves[i]);
+      if ((options && options.sloppy) || !king_attacked(us)) {
+        legal_moves.push(moves[i]);
       }
-      undo_move()
+      undo_move();
     }
-
-    return legal_moves
+  
+    return legal_moves;
   }
 
   /* convert a move from 0x88 coordinates to Standard Algebraic Notation
